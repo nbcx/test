@@ -20,8 +20,8 @@ branches:
 before_deploy: make build-all
 deploy:
     provider: releases
-    api_key:
-        secure: xxxx
+    # api_key:
+    #     secure: xxxx
     # 使用glob匹配发布bin目录下的文件
     file_glob: true
     file: bin/*
