@@ -5,9 +5,8 @@ name: Go
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    tags:      
+      - '*'           # 创建所有 tag 都运行打包 v* 则 v1.0 这种也行
 
 jobs:
 
