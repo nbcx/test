@@ -1,0 +1,42 @@
+language: go
+
+go:
+  - 1.20.x
+
+# 执行测试
+script:
+  - go test -v ./...
+
+# 缓存依赖项，加快构建速度
+cache:
+  directories:
+    - $GOPATH/pkg/mod
+
+# 指定分支
+branches:
+  only:
+    - main
+
+before_deploy: make build-all
+deploy:
+    provider: releases
+    api_key:
+        secure: xxxx
+    # 使用glob匹配发布bin目录下的文件
+    file_glob: true
+    file: bin/*
+    skip_cleanup: true
+    on:
+        repo: nbcx/test
+        # tag才触发发布
+        tags: true
+
+# 通知设置
+notifications:
+  email:
+    recipients:
+      - collin@nb.cx
+    on_success: change
+    on_failure: always
+
+
