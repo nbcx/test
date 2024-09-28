@@ -1,7 +1,7 @@
 GOCMD=go
 GOBUILD=$(GOCMD) build
 BINARY_NAME=bin
-NAME=blog-sync
+NAME=test
 
 #mac
 build:

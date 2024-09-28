@@ -1,49 +1,69 @@
 package main
 
 import (
-	"log"
-
 	"fmt"
-	"net/http"
-	"strings"
+	"test/pkg"
 
-	"github.com/nbcx/boot"
+	"github.com/nbcx/flag"
+	"github.com/nbcx/go-config/fig"
+	"github.com/nbcx/log"
 )
 
 func main() {
-	app := boot.First(&Server{})
-	if err := boot.Execute(app); err != nil {
-		log.Fatalf("server run err: %v", err)
+	// 指定要解析的配置文件
+	// viper.SetConfigFile("test.ini")
+	// if err := viper.ReadInConfig(); err != nil {
+	// 	log.Fatal(err)
+	// }
+	// // 默认section为default
+	// fmt.Printf("app_mode:%v\n", viper.Get(`default.app_mode`))
+	// fmt.Printf("server.protocol:%v\n", viper.GetString(`server.protocol`))
+
+	fig.SetConfigFile("app.ini")
+	if err := fig.ReadInConfig(); err != nil {
+		log.Fatal(err)
 	}
+	// 默认section为default
+	log.Info("appname::::::", fig.Sub("default").Get("appname"))
+	fmt.Printf("app_mode2:%v\n", fig.Get(`default.appname`))
+
+	// log.Info(fig.AllSettings())
+	// fmt.Printf("server.protocol2:%v\n", fig.Get(`server.protocol`))
+
+	// fig.SetConfigType("ini") // or viper.SetConfigType("YAML")
+	// fig.AddConfigPath(".")
+	// fig.SetConfigName("app")
+
+	// err := fig.ReadInConfig()
+
+	// log.Error("err", err)
+
+	// fmt.Println(">>>>>>>>:", fig.Get("appname"))
+
 }
 
-type Server struct {
-	boot.Default
-	Addr string `name:"addr" short:"a" value:":8080" usage:"service monitoring address"`
-}
+func main2() {
+	fig.SetConfigType("yaml") // or viper.SetConfigType("YAML")
+	fig.AddConfigPath(".")
+	fig.SetConfigName("conf.yaml")
 
-func (c *Server) GetUse() string {
-	return "test {path}"
-}
+	_ = fig.ReadInConfig()
 
-func (c *Server) GetLong() string {
-	return "static web service"
-}
+	// config.Get("name") // this would be "steve"
 
-func (c *Server) Exec(r ...string) error {
-	path := "./"
-	if len(r) > 0 {
-		path = r[0]
-	}
-	// set static dir
-	http.Handle("/", http.FileServer(http.Dir(path)))
+	flag.Int("name", 1234, "help message for flagname")
 
-	// show in terminal and click jump
-	show := c.Addr
-	if strings.Split(c.Addr, ":")[0] == "" {
-		show = fmt.Sprintf("http://localhost%s", c.Addr)
-	}
-	fmt.Printf("Listening: \x1b]8;;%s\x1b\\%s\x1b]8;;\x1b\\\n", show, show)
-	err := http.ListenAndServe(c.Addr, nil)
-	return err
+	flag.Parse()
+	fig.BindPFlags(flag.CommandLine)
+
+	i := fig.Get("name") // retrieve values from viper instead of pflag
+
+	fmt.Println(">>>>>>>>", i)
+
+	co := &pkg.Config{}
+	_ = fig.Unmarshal(co)
+
+	fmt.Println("co", co)
+
+	log.Info("hello retrieve values from viper instead of pflag", 0000, "hell")
 }
